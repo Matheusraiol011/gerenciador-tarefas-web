@@ -62,8 +62,3 @@ estruturas/   avl.py  heap.py  hash_table.py  trie.py  grafo.py  strings.py
 gerenciador.py   main.py   server.py   static/index.html
 tests/   test_tudo.py  test_api.py
 ```
-
-## Entregas
-
-1. 19 e 21/10/2026: apresentação do tema (seção "Tema" acima).
-2. Dezembro: slides + relatório em PDF + anexo com os principais prompts usados.
