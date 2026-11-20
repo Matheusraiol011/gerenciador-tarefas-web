@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QUEST</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --papel:#E8EDF3; --grade:#D3DCE7; --folha:#FAFBFD; --tinta:#16213A; --tinta-2:#4A5873; --linha:#C3CEDC;
+  --azul:#2457C5; --azul-claro:#DCE6FA; --marca:#FFD84D; --marca-clara:#FFF1B8;
+  --verde:#1C7F55; --verde-claro:#D9F0E4; --vermelho:#BF3B2B; --vermelho-claro:#F8DDD8;
+  --sans:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; font-family:var(--sans); font-size:16px; line-height:1.45; color:var(--tinta);
+  background-color:var(--papel);
+  background-image:linear-gradient(var(--grade) 1px,transparent 1px),linear-gradient(90deg,var(--grade) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+button,input,select,textarea{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--azul); outline-offset:2px}
+.so-leitor{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+[hidden]{display:none!important}
+
+/* ---------- topo ---------- */
+.topo{
+  display:grid; grid-template-columns:auto minmax(260px,560px) auto; gap:24px; align-items:start;
+  padding:20px 28px 16px; max-width:1500px; margin:0 auto;
+}
+.marca{margin:0; font-size:32px; line-height:1; font-weight:800; letter-spacing:-.04em; padding-top:6px}
+.busca label.campo{display:block}
+.busca input[type=search]{
+  width:100%; padding:10px 14px; background:var(--folha); border:1.5px solid var(--tinta); border-radius:4px; font-size:16px;
+}
+.modos{display:flex; gap:0; margin-top:8px; border:1.5px solid var(--tinta); border-radius:4px; width:max-content; background:var(--folha)}
+.modos label{position:relative}
+.modos input{position:absolute; opacity:0; inset:0; cursor:pointer}
+.modos span{display:block; padding:5px 12px; font-size:14px; font-weight:600}
+.modos label+label span{border-left:1.5px solid var(--tinta)}
+.modos input:checked+span{background:var(--tinta); color:var(--folha)}
+.modos input:focus-visible+span{outline:3px solid var(--azul); outline-offset:2px}
+.dica{margin:6px 0 0; font-size:13px; color:var(--tinta-2)}
+.sugestoes{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
+.sugestoes button{padding:2px 10px; border:1.5px solid var(--azul); background:var(--azul-claro); color:var(--tinta); border-radius:999px; font-size:13px}
+.primario{
+  background:var(--azul); color:#fff; border:1.5px solid var(--tinta); border-radius:4px; padding:10px 18px; font-weight:600;
+}
+.primario:hover{background:#1B46A3}
+.secundario{background:var(--folha); border:1.5px solid var(--tinta); border-radius:4px; padding:8px 14px; font-weight:600}
+.secundario:hover{background:var(--azul-claro)}
+.perigo{background:transparent; border:1.5px solid var(--vermelho); color:var(--vermelho); border-radius:4px; padding:8px 14px; font-weight:600}
+.perigo:hover,.perigo.confirmar{background:var(--vermelho); color:#fff}
+
+/* ---------- próxima tarefa ---------- */
+main{max-width:1500px; margin:0 auto; padding:0 28px 48px}
+.proxima{
+  background:var(--marca); border:1.5px solid var(--tinta); border-radius:4px; padding:18px 22px;
+  display:flex; flex-wrap:wrap; gap:16px 28px; align-items:center; justify-content:space-between; margin-bottom:24px;
+}
+.proxima h2{margin:0; font-size:15px; font-weight:600}
+.proxima .nome{margin:2px 0 4px; font-size:clamp(24px,3.2vw,38px); line-height:1.1; font-weight:800; letter-spacing:-.03em}
+.proxima .nome button{all:unset; cursor:pointer}
+.proxima .nome button:hover{text-decoration:underline; text-decoration-thickness:3px}
+.proxima .nome button:focus-visible{outline:3px solid var(--azul); outline-offset:3px}
+.proxima p{margin:0; font-size:14px}
+.proxima .acoes{display:flex; gap:10px}
+.proxima .secundario{background:var(--marca-clara)}
+.proxima .secundario:hover{background:var(--folha)}
+
+/* ---------- colunas ---------- */
+.colunas{display:grid; grid-template-columns:minmax(340px,5fr) minmax(0,7fr); gap:24px; align-items:start}
+.colunas>*{min-width:0}
+.folha{background:var(--folha); border:1.5px solid var(--tinta); border-radius:4px}
+.cab{padding:14px 18px 12px; border-bottom:1.5px solid var(--tinta)}
+.cab h2{margin:0; font-size:20px; font-weight:800; letter-spacing:-.02em}
+.cab .contagem{font-weight:400; color:var(--tinta-2); font-size:15px; letter-spacing:0}
+.controles{display:flex; flex-wrap:wrap; gap:10px 18px; margin-top:10px; align-items:end}
+.controles label{display:flex; flex-direction:column; font-size:13px; color:var(--tinta-2); gap:2px}
+.controles select,.controles input[type=date]{padding:5px 8px; border:1.5px solid var(--tinta); border-radius:4px; background:var(--folha); font-size:14px; color:var(--tinta)}
+.controles .limpar{background:none; border:none; color:var(--azul); font-weight:600; text-decoration:underline; padding:6px 0}
+
+.tarefas{list-style:none; margin:0; padding:0}
+.tarefa{
+  display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:start; padding:12px 18px; border-bottom:1px solid var(--linha);
+}
+.tarefa:last-child{border-bottom:none}
+.tarefa.novo{animation:marcar 1.8s ease-out}
+@keyframes marcar{from{background:var(--marca)}to{background:transparent}}
+.check{
+  width:24px; height:24px; margin-top:2px; border-radius:50%; border:2px solid var(--tinta); background:var(--folha); padding:0; position:relative;
+}
+.st-andamento .check{background:linear-gradient(90deg,var(--azul) 50%,var(--folha) 50%)}
+.st-concluida .check{background:var(--verde); border-color:var(--verde)}
+.st-concluida .check::after{content:""; position:absolute; left:7px; top:2px; width:6px; height:12px; border:solid #fff; border-width:0 2.5px 2.5px 0; transform:rotate(45deg)}
+.tarefa .titulo{all:unset; cursor:pointer; font-weight:600; font-size:17px; line-height:1.25; display:block}
+.tarefa .titulo:hover{text-decoration:underline}
+.tarefa .titulo:focus-visible{outline:3px solid var(--azul); outline-offset:2px}
+.st-concluida .titulo{text-decoration:line-through; color:var(--tinta-2); font-weight:400}
+.meta{display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:3px; font-size:13px; color:var(--tinta-2); align-items:center}
+.meta .atraso{color:var(--vermelho); font-weight:600}
+.meta .bloqueio{color:var(--vermelho); font-weight:600}
+.tag{background:var(--azul-claro); border-radius:3px; padding:0 6px; color:var(--tinta)}
+.prio{font-family:var(--mono); font-weight:600; font-size:13px; padding:2px 7px; border-radius:3px; background:#E1E7EF; border:1px solid var(--linha)}
+.prio-1{background:var(--vermelho-claro); border-color:var(--vermelho); color:#7C2217}
+.prio-2{background:var(--marca-clara); border-color:#C9A400}
+.vazio{padding:28px 20px; color:var(--tinta-2)}
+.vazio p{margin:0 0 12px}
+.vazio .acoes{display:flex; gap:10px; flex-wrap:wrap}
+
+/* ---------- laboratório ---------- */
+.abas{display:flex; border-bottom:1.5px solid var(--tinta); overflow-x:auto}
+.aba{
+  flex:1 0 auto; text-align:left; background:var(--folha); border:none; border-right:1.5px solid var(--tinta); padding:10px 16px; font-weight:800; font-size:16px; letter-spacing:-.01em;
+}
+.aba:last-child{border-right:none}
+.aba small{display:block; font-weight:400; font-size:12.5px; color:var(--tinta-2); letter-spacing:0}
+.aba[aria-selected=true]{background:var(--tinta); color:var(--folha)}
+.aba[aria-selected=true] small{color:#B8C3D8}
+.painel{padding:16px 18px 20px}
+.legenda{margin:0 0 12px; font-size:14px; color:var(--tinta-2); max-width:72ch}
+.legenda strong{color:var(--tinta)}
+.rolagem{overflow:auto; border:1px solid var(--linha); background:
+  linear-gradient(var(--folha),var(--folha))}
+.rolagem svg{display:block}
+svg text{font-family:var(--sans); fill:var(--tinta)}
+svg .mono{font-family:var(--mono)}
+svg .leve{fill:var(--tinta-2)}
+svg .halo{paint-order:stroke; stroke:var(--folha); stroke-width:4px; stroke-linejoin:round}
+.chaves{display:flex; flex-wrap:wrap; gap:6px 18px; margin-top:12px; font-size:13px; color:var(--tinta-2)}
+.chaves span{display:inline-flex; align-items:center; gap:6px}
+.chaves i{display:inline-block; width:16px; height:12px; border:1.5px solid var(--tinta); border-radius:2px; background:var(--folha)}
+.chaves i.c{background:var(--verde-claro); border-color:var(--verde)}
+.chaves i.a{background:var(--azul-claro); border-color:var(--azul)}
+.chaves i.b{border:1.5px dashed var(--vermelho); background:var(--vermelho-claro)}
+.chaves i.k{height:0; border:none; border-top:3px solid var(--azul); width:20px}
+.no{cursor:pointer}
+.no rect,.no circle{fill:var(--folha); stroke:var(--tinta); stroke-width:1.5}
+.no.n-andamento rect,.no.n-andamento circle{fill:var(--azul-claro); stroke:var(--azul)}
+.no.n-concluida rect,.no.n-concluida circle{fill:var(--verde-claro); stroke:var(--verde)}
+.no.n-bloqueada rect{fill:var(--vermelho-claro); stroke:var(--vermelho); stroke-dasharray:5 3}
+.no.raiz circle{fill:var(--marca)}
+.no.recente rect,.no.recente circle{stroke:var(--tinta); stroke-width:4}
+.no:hover rect,.no:hover circle{stroke-width:3}
+.no:focus-visible{outline:none}
+.no:focus-visible rect,.no:focus-visible circle{stroke:var(--azul); stroke-width:4}
+.aresta{fill:none; stroke:#8795AD; stroke-width:1.5}
+.aresta.critica{stroke:var(--azul); stroke-width:3}
+.seta{fill:#8795AD} .seta.critica{fill:var(--azul)}
+
+.celulas{display:flex; flex-wrap:wrap; gap:0; margin-top:14px}
+.celula{border:1.5px solid var(--tinta); margin-right:-1.5px; min-width:54px; text-align:center; background:var(--folha); padding:0}
+.celula button{all:unset; display:block; width:100%; padding:6px 8px 4px; cursor:pointer; font-family:var(--mono); font-weight:600; font-size:14px}
+.celula button:focus-visible{outline:3px solid var(--azul); outline-offset:-3px}
+.celula .p{display:block; font-size:12px; color:var(--tinta-2); font-weight:400}
+.celula .i{display:block; border-top:1px solid var(--linha); font-family:var(--mono); font-size:11px; color:var(--tinta-2); background:#EEF2F7; padding:1px 0}
+.celula.topo-fila{background:var(--marca)}
+
+.baldes{display:grid; grid-template-columns:auto 1fr; gap:0; max-height:520px; overflow:auto; border:1px solid var(--linha)}
+.baldes>*{border-bottom:1px solid var(--linha); padding:6px 10px; min-height:38px}
+.baldes .ind{font-family:var(--mono); font-size:13px; color:var(--tinta-2); border-right:1px solid var(--linha); background:#EEF2F7; text-align:right}
+.baldes .cadeia{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+.baldes .cadeia button{font-family:var(--mono); font-weight:600; font-size:13px; padding:2px 8px; border:1.5px solid var(--tinta); background:var(--folha); border-radius:3px}
+.baldes .cadeia button:hover{background:var(--marca-clara)}
+.baldes .cadeia .lig{color:var(--tinta-2)}
+.baldes .colisao{font-size:12.5px; color:var(--vermelho); font-weight:600; margin-left:6px}
+.baldes .nada{color:#9AA7BC; font-size:13px}
+
+.trie{max-height:560px; overflow:auto; border:1px solid var(--linha); padding:10px 12px; font-family:var(--mono); font-size:14px}
+.trie ul{list-style:none; margin:0; padding-left:18px; border-left:1.5px solid var(--linha)}
+.trie>ul{border-left:none; padding-left:0}
+.trie li{margin:2px 0}
+.trie details>summary{cursor:pointer; list-style:none; display:inline-flex; align-items:center; gap:8px; padding:1px 4px; border-radius:3px}
+.trie details>summary::-webkit-details-marker{display:none}
+.trie details>summary::before{content:"+"; color:var(--tinta-2); width:10px; display:inline-block}
+.trie details[open]>summary::before{content:"\2212"}
+.trie .folha-t{display:inline-flex; gap:8px; padding:1px 4px 1px 22px}
+.trie .letras{font-weight:600}
+.trie .fim{background:var(--verde-claro); border:1px solid var(--verde); border-radius:3px; padding:0 6px; font-size:12.5px}
+.trie .fim button{all:unset; cursor:pointer; text-decoration:underline}
+.trie .caminho>summary,.trie .caminho.folha-t{background:var(--marca)}
+
+/* ---------- diálogo ---------- */
+dialog{border:1.5px solid var(--tinta); border-radius:4px; background:var(--folha); color:var(--tinta); padding:0; width:min(560px,calc(100% - 24px)); max-height:calc(100% - 24px)}
+dialog::backdrop{background:rgba(22,33,58,.5)}
+dialog form{padding:20px 22px}
+dialog h2{margin:0 0 14px; font-size:22px; font-weight:800; letter-spacing:-.02em}
+dialog label{display:block; font-size:14px; font-weight:600; margin-bottom:12px}
+dialog input:not([type=checkbox]),dialog textarea,dialog select{
+  display:block; width:100%; margin-top:3px; padding:8px 10px; border:1.5px solid var(--tinta); border-radius:4px; background:#fff; font-weight:400; font-size:16px;
+}
+.trio{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+@media (max-width:520px){.trio{grid-template-columns:1fr}}
+fieldset{border:1.5px solid var(--linha); border-radius:4px; margin:0 0 12px; padding:6px 12px 10px}
+legend{font-size:14px; font-weight:600; padding:0 4px}
+.deps{max-height:150px; overflow:auto}
+.deps label{display:flex; gap:8px; align-items:flex-start; font-weight:400; margin:4px 0}
+.deps input{margin-top:5px}
+.deps .vazio-d{color:var(--tinta-2); font-size:14px; margin:4px 0}
+.erro{background:var(--vermelho-claro); border:1.5px solid var(--vermelho); border-radius:4px; padding:8px 12px; margin:0 0 12px; font-size:14px}
+dialog .acoes{display:flex; gap:10px; align-items:center}
+dialog .espaco{flex:1}
+
+/* ---------- aviso ---------- */
+#aviso{
+  position:fixed; left:50%; bottom:20px; transform:translateX(-50%); max-width:min(560px,calc(100% - 24px)); z-index:20;
+  background:var(--tinta); color:#fff; border-radius:4px; padding:10px 16px; font-size:15px; font-weight:600; opacity:0; pointer-events:none; transition:opacity .15s;
+}
+#aviso.mostrar{opacity:1}
+#aviso.erro-a{background:var(--vermelho)}
+
+@media (max-width:1020px){
+  .topo{grid-template-columns:1fr auto; padding:16px}
+  .topo .busca{grid-column:1 / -1; order:3}
+  main{padding:0 16px 40px}
+  .colunas{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <h1 class="marca">QUEST</h1>
+  <form class="busca" role="search" onsubmit="return false">
+    <label class="campo"><span class="so-leitor">Buscar tarefas</span>
+      <input type="search" id="q" placeholder="Buscar tarefas" autocomplete="off"></label>
+    <div class="modos" role="radiogroup" aria-label="Tipo de busca">
+      <label><input type="radio" name="modo" value="prefixo" checked><span>Prefixo</span></label>
+      <label><input type="radio" name="modo" value="texto"><span>Texto exato</span></label>
+      <label><input type="radio" name="modo" value="aproximado"><span>Aproximada</span></label>
+    </div>
+    <p class="dica" id="dica"></p>
+    <div class="sugestoes" id="sugestoes"></div>
+  </form>
+  <button class="primario" id="nova" type="button">Nova tarefa</button>
+</header>
+
+<main>
+  <section class="proxima" id="proxima" aria-live="polite"></section>
+
+  <div class="colunas">
+    <section class="folha" aria-labelledby="h-tarefas">
+      <div class="cab">
+        <h2 id="h-tarefas">Tarefas <span class="contagem" id="contagem"></span></h2>
+        <div class="controles">
+          <label>Ordenar por
+            <select id="ordem">
+              <option value="prazo">Prazo (árvore AVL)</option>
+              <option value="prioridade">Prioridade (heap)</option>
+              <option value="id">Criação</option>
+            </select></label>
+          <label>Vence a partir de <input type="date" id="de"></label>
+          <label>Vence até <input type="date" id="ate"></label>
+          <button type="button" class="limpar" id="limpar" hidden>Limpar filtros</button>
+        </div>
+      </div>
+      <ul class="tarefas" id="lista"></ul>
+    </section>
+
+    <section class="folha" aria-label="Estruturas de dados">
+      <div class="abas" role="tablist" id="abas"></div>
+      <div class="painel" id="painel" role="tabpanel"></div>
+    </section>
+  </div>
+</main>
+
+<dialog id="dlg" aria-labelledby="dlg-titulo">
+  <form id="form" novalidate>
+    <h2 id="dlg-titulo">Nova tarefa</h2>
+    <label>Título <input id="f-titulo" maxlength="120" autocomplete="off"></label>
+    <label>Descrição <textarea id="f-desc" rows="3"></textarea></label>
+    <div class="trio">
+      <label>Prazo <input type="date" id="f-prazo"></label>
+      <label>Prioridade
+        <select id="f-prio">
+          <option value="1">1 (mais urgente)</option><option value="2">2</option><option value="3" selected>3</option>
+          <option value="4">4</option><option value="5">5 (menos urgente)</option>
+        </select></label>
+      <label id="f-status-w">Status
+        <select id="f-status"><option value="pendente">Pendente</option><option value="andamento">Em andamento</option><option value="concluida">Concluída</option></select></label>
+    </div>
+    <label>Tags, separadas por vírgula <input id="f-tags" placeholder="estudo, projeto" autocomplete="off"></label>
+    <fieldset><legend>Depende de</legend><div class="deps" id="f-deps"></div></fieldset>
+    <p class="erro" id="f-erro" role="alert" hidden></p>
+    <div class="acoes">
+      <button type="button" class="perigo" id="f-excluir">Excluir tarefa</button>
+      <span class="espaco"></span>
+      <button type="button" class="secundario" id="f-cancelar">Cancelar</button>
+      <button type="submit" class="primario">Salvar</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="aviso" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ================= utilitários ================= */
+const SVGNS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+function aplicar(n, attrs) {
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v === true ? "" : v);
+  }
+}
+function juntar(n, kids) {
+  for (const k of kids.flat(Infinity)) {
+    if (k == null || k === false) continue;
+    n.append(k.nodeType ? k : document.createTextNode(String(k)));
+  }
+}
+const el = (tag, attrs, ...kids) => { const n = document.createElement(tag); aplicar(n, attrs); juntar(n, kids); return n; };
+const sv = (tag, attrs, ...kids) => { const n = document.createElementNS(SVGNS, tag); aplicar(n, attrs); juntar(n, kids); return n; };
+const cortar = (s, n) => s.length > n ? s.slice(0, n - 1) + "…" : s;
+// Reduz o desenho para caber na coluna (até 75% do tamanho); acima disso, rola para o lado.
+function ajustar(svg, largura) {
+  svg.setAttribute("style", `max-width:none; height:auto; width:min(${largura}px, max(100%, ${Math.round(largura * 0.85)}px))`);
+  return svg;
+}
+const MESES = ["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"];
+function dataCurta(s) {
+  if (!s || s.startsWith("9999")) return "—";
+  const [, m, d] = s.split("-");
+  return `${+d} ${MESES[+m - 1]}`;
+}
+function dataLonga(s) { const [a, m, d] = s.split("-"); return `${d}/${m}/${a}`; }
+const hoje = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; })();
+const semAcento = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+/* ================= estado e API ================= */
+const S = { ordem: "prazo", dados: null, aba: "grafo", recente: null,
+            busca: { modo: "prefixo", q: "", ids: null, sugestoes: [] }, periodo: { ids: null } };
+
+async function api(metodo, url, corpo) {
+  const opc = { method: metodo };
+  if (metodo !== "GET") opc.headers = { "Content-Type": "application/json" };
+  if (corpo) opc.body = JSON.stringify(corpo);
+  const r = await fetch(url, opc);
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.erro || `Erro ${r.status}`);
+  return j;
+}
+
+let tAviso;
+function aviso(msg, erro) {
+  const a = $("aviso");
+  a.textContent = msg;
+  a.className = "mostrar" + (erro ? " erro-a" : "");
+  clearTimeout(tAviso);
+  tAviso = setTimeout(() => a.className = "", 4800);
+}
+const porId = () => new Map(S.dados.tarefas.map(t => [t.id, t]));
+
+async function carregar() {
+  S.dados = await api("GET", `/api/estado?ordem=${S.ordem}`);
+  await refazerFiltros(false);
+  render();
+}
+
+/* ================= filtros (busca e período) ================= */
+const DICAS = {
+  prefixo: "Trie: palavras dos títulos e das tags, sem diferenciar acentos.",
+  texto: "KMP: procura o trecho exato no título e na descrição.",
+  aproximado: "Levenshtein: aceita até 2 erros de digitação nas palavras do título."
+};
+let reqBusca = 0, tBusca;
+async function executarBusca() {
+  const { modo, q } = S.busca, n = ++reqBusca;
+  if (!q.trim()) { S.busca.ids = null; S.busca.sugestoes = []; return; }
+  const r = await api("GET", `/api/busca?modo=${modo}&q=${encodeURIComponent(q)}`);
+  if (n !== reqBusca) return;
+  S.busca.ids = r.ids; S.busca.sugestoes = r.sugestoes;
+}
+async function executarPeriodo() {
+  const de = $("de").value, ate = $("ate").value;
+  if (!de && !ate) { S.periodo.ids = null; return; }
+  S.periodo.ids = (await api("GET", `/api/periodo?inicio=${de}&fim=${ate}`)).ids;
+}
+async function refazerFiltros(desenhar = true) {
+  try { await Promise.all([executarBusca(), executarPeriodo()]); }
+  catch (e) { aviso(e.message, true); }
+  if (desenhar) render();
+}
+function visiveis() {
+  const b = S.busca.ids && new Set(S.busca.ids), p = S.periodo.ids && new Set(S.periodo.ids);
+  return S.dados.tarefas.filter(t => (!b || b.has(t.id)) && (!p || p.has(t.id)));
+}
+const filtrando = () => S.busca.ids !== null || S.periodo.ids !== null;
+
+/* ================= renderização: página ================= */
+function render() {
+  $("dica").textContent = DICAS[S.busca.modo];
+  renderSugestoes(); renderProxima(); renderLista(); renderLab();
+}
+
+function renderSugestoes() {
+  const alvo = $("sugestoes");
+  alvo.replaceChildren(...S.busca.sugestoes.map(s =>
+    el("button", { type: "button", onclick: () => { $("q").value = s; S.busca.q = s; refazerFiltros(); } }, s)));
+}
+
+function renderProxima() {
+  const alvo = $("proxima"), mapa = porId(), t = mapa.get(S.dados.proxima);
+  alvo.replaceChildren();
+  if (!S.dados.tarefas.length) {
+    alvo.append(el("div", {}, el("h2", {}, "Próxima tarefa"),
+      el("p", { class: "nome" }, "Nada por aqui ainda"),
+      el("p", {}, "Crie uma tarefa para ver o que fazer primeiro.")));
+    return;
+  }
+  if (!t) {
+    alvo.append(el("div", {}, el("h2", {}, "Próxima tarefa"),
+      el("p", { class: "nome" }, "Nenhuma tarefa liberada"),
+      el("p", {}, "Tudo está concluído ou aguardando outra tarefa.")));
+    return;
+  }
+  alvo.append(
+    el("div", {},
+      el("h2", {}, "Próxima tarefa"),
+      el("p", { class: "nome" }, el("button", { type: "button", onclick: () => abrirDialogo(t.id) }, t.titulo)),
+      el("p", {}, `Prioridade ${t.prioridade}`, t.prazo ? `, vence em ${dataLonga(t.prazo)}` : ", sem prazo",
+        ". Escolhida pela fila de prioridades entre as tarefas sem bloqueios.")),
+    el("div", { class: "acoes" },
+      t.status === "pendente" && el("button", { class: "secundario", type: "button", onclick: () => mudarStatus(t.id, "andamento") }, "Começar"),
+      el("button", { class: "secundario", type: "button", onclick: () => mudarStatus(t.id, "concluida") }, "Concluir")));
+}
+
+function renderLista() {
+  const lista = $("lista"), todas = S.dados.tarefas, vis = visiveis();
+  $("contagem").textContent = filtrando() ? `${vis.length} de ${todas.length}` : `${todas.length}`;
+  $("limpar").hidden = !filtrando();
+  lista.replaceChildren();
+  if (!todas.length) {
+    lista.append(el("li", { class: "vazio" },
+      el("p", {}, "Nenhuma tarefa ainda. Crie a primeira ou carregue um exemplo para ver as estruturas funcionando."),
+      el("div", { class: "acoes" },
+        el("button", { class: "primario", type: "button", onclick: () => abrirDialogo() }, "Criar tarefa"),
+        el("button", { class: "secundario", type: "button", onclick: carregarExemplo }, "Carregar exemplo"))));
+    return;
+  }
+  if (!vis.length) {
+    lista.append(el("li", { class: "vazio" },
+      el("p", {}, "Nenhuma tarefa corresponde aos filtros."),
+      el("div", { class: "acoes" }, el("button", { class: "secundario", type: "button", onclick: limparFiltros }, "Limpar filtros"))));
+    return;
+  }
+  for (const t of vis) lista.append(linha(t));
+  S.recente = null;
+}
+
+function linha(t) {
+  const atrasada = t.prazo && t.prazo < hoje && t.status !== "concluida";
+  const proximo = { pendente: "em andamento", andamento: "concluída", concluida: "pendente" }[t.status];
+  const rotuloStatus = { pendente: "pendente", andamento: "em andamento", concluida: "concluída" }[t.status];
+  return el("li", { class: `tarefa st-${t.status}${t.id === S.recente ? " novo" : ""}` },
+    el("button", { class: "check", type: "button",
+      "aria-label": `${t.titulo}: ${rotuloStatus}. Mudar para ${proximo}`, title: `Mudar para ${proximo}`,
+      onclick: () => mudarStatus(t.id, { pendente: "andamento", andamento: "concluida", concluida: "pendente" }[t.status]) }),
+    el("div", {},
+      el("button", { class: "titulo", type: "button", onclick: () => abrirDialogo(t.id) }, t.titulo),
+      el("div", { class: "meta" },
+        t.prazo && el("span", { class: atrasada ? "atraso" : "", title: dataLonga(t.prazo) }, atrasada ? `venceu em ${dataCurta(t.prazo)}` : `vence em ${dataCurta(t.prazo)}`),
+        t.bloqueios.length > 0 && el("span", { class: "bloqueio" }, "aguarda " + t.bloqueios.map(b => "#" + b).join(" ")),
+        t.tags.map(g => el("span", { class: "tag" }, g)))),
+    el("span", { class: `prio prio-${t.prioridade}`, title: `Prioridade ${t.prioridade} (1 é a mais urgente)` }, `P${t.prioridade}`));
+}
+
+function limparFiltros() {
+  $("q").value = ""; $("de").value = ""; $("ate").value = "";
+  S.busca.q = ""; refazerFiltros();
+}
+
+/* ================= ações ================= */
+async function mudarStatus(id, status) {
+  try { await api("PUT", `/api/tarefas/${id}`, { status }); S.recente = id; await carregar(); }
+  catch (e) { aviso(e.message[0].toUpperCase() + e.message.slice(1), true); }
+}
+
+async function carregarExemplo() {
+  const ex = [
+    { k: "tema", titulo: "Apresentar o tema do gerenciador", descricao: "Entrega de 19 e 21/10.", prazo: "2026-10-19", prioridade: 1, tags: ["apresentação"] },
+    { k: "avl", titulo: "Estudar árvores AVL", descricao: "Rotações simples e duplas.", prazo: "2026-10-25", prioridade: 2, tags: ["estudo", "avl"] },
+    { k: "grafo", titulo: "Estudar grafos", descricao: "Ordenação topológica e detecção de ciclos.", prazo: "2026-10-28", prioridade: 2, tags: ["estudo", "grafos"] },
+    { k: "impl", titulo: "Implementar as estruturas", descricao: "AVL, heap, hash, trie, grafo, KMP e Levenshtein.", prazo: "2026-11-15", prioridade: 1, tags: ["projeto"], deps: ["avl", "grafo"] },
+    { k: "web", titulo: "Montar a interface web", descricao: "Página HTML com visualização das estruturas.", prazo: "2026-11-25", prioridade: 3, tags: ["projeto"], deps: ["impl"] },
+    { k: "rel", titulo: "Escrever o relatório", descricao: "Inclui o anexo com os principais prompts.", prazo: "2026-12-05", prioridade: 2, tags: ["projeto", "relatório"], deps: ["impl"] },
+    { k: "slides", titulo: "Preparar os slides", descricao: "Resumo do sistema e das estruturas.", prazo: "2026-12-10", prioridade: 1, tags: ["apresentação"], deps: ["web", "rel"] },
+    { k: "ensaio", titulo: "Ensaiar a apresentação final", descricao: "", prazo: "2026-12-12", prioridade: 2, tags: ["apresentação"], deps: ["slides"] }
+  ];
+  const ids = {};
+  try {
+    for (const e of ex) {
+      const r = await api("POST", "/api/tarefas", { titulo: e.titulo, descricao: e.descricao, prazo: e.prazo, prioridade: e.prioridade, tags: e.tags, dependencias: (e.deps || []).map(k => ids[k]) });
+      ids[e.k] = r.id;
+    }
+    aviso("Exemplo carregado");
+  } catch (e) { aviso(e.message, true); }
+  await carregar();
+}
+
+/* ================= diálogo ================= */
+let editando = null, confirmarExclusao = false;
+function abrirDialogo(id) {
+  editando = id ?? null;
+  const t = editando != null ? porId().get(editando) : null;
+  $("dlg-titulo").textContent = t ? `Tarefa #${t.id}` : "Nova tarefa";
+  $("f-titulo").value = t ? t.titulo : "";
+  $("f-desc").value = t ? t.descricao : "";
+  $("f-prazo").value = t ? t.prazo : "";
+  $("f-prio").value = t ? t.prioridade : 3;
+  $("f-status").value = t ? t.status : "pendente";
+  $("f-tags").value = t ? t.tags.join(", ") : "";
+  $("f-status-w").hidden = !t;
+  resetarExcluir(); $("f-excluir").hidden = !t;
+  $("f-erro").hidden = true;
+  const outras = S.dados.tarefas.filter(x => x.id !== editando);
+  $("f-deps").replaceChildren(...(outras.length ? outras.map(x =>
+    el("label", {}, el("input", { type: "checkbox", value: x.id, checked: t && t.dependencias.includes(x.id) }),
+      el("span", {}, `#${x.id} ${x.titulo}`))) : [el("p", { class: "vazio-d" }, "Ainda não há outras tarefas.")]));
+  $("dlg").showModal();
+  $("f-titulo").focus();
+}
+function resetarExcluir() { confirmarExclusao = false; const b = $("f-excluir"); b.textContent = "Excluir tarefa"; b.classList.remove("confirmar"); }
+function erroDialogo(msg) {
+  if (/ciclo/.test(msg)) msg = "Essa dependência criaria um ciclo: uma das tarefas escolhidas já depende, direta ou indiretamente, desta.";
+  const p = $("f-erro"); p.textContent = msg[0].toUpperCase() + msg.slice(1); p.hidden = false;
+}
+
+$("form").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  $("f-erro").hidden = true;
+  const corpo = {
+    titulo: $("f-titulo").value.trim(), descricao: $("f-desc").value, prazo: $("f-prazo").value,
+    prioridade: +$("f-prio").value, tags: $("f-tags").value.split(",").map(s => s.trim()).filter(Boolean)
+  };
+  const marcadas = [...$("f-deps").querySelectorAll("input:checked")].map(c => +c.value);
+  try {
+    if (editando == null) {
+      const r = await api("POST", "/api/tarefas", { ...corpo, dependencias: marcadas });
+      S.recente = r.id; aviso("Tarefa criada");
+    } else {
+      const antes = new Set(porId().get(editando).dependencias), depois = new Set(marcadas);
+      for (const d of antes) if (!depois.has(d)) await api("DELETE", `/api/dependencias/${d}/${editando}`);
+      for (const d of depois) if (!antes.has(d)) await api("POST", "/api/dependencias", { antes: d, depois: editando });
+      await api("PUT", `/api/tarefas/${editando}`, { ...corpo, status: $("f-status").value });
+      S.recente = editando; aviso("Alterações salvas");
+    }
+    $("dlg").close(); await carregar();
+  } catch (e) { erroDialogo(e.message); carregar(); }
+});
+$("f-cancelar").addEventListener("click", () => $("dlg").close());
+$("f-excluir").addEventListener("click", async () => {
+  if (!confirmarExclusao) {
+    confirmarExclusao = true; const b = $("f-excluir"); b.textContent = "Confirmar exclusão"; b.classList.add("confirmar"); return;
+  }
+  try {
+    const r = await api("DELETE", `/api/tarefas/${editando}`);
+    aviso(`Tarefa #${editando} excluída` + (r.dependentes.length ? `. Dependiam dela: ${r.dependentes.map(d => "#" + d).join(", ")}` : ""));
+    $("dlg").close(); await carregar();
+  } catch (e) { erroDialogo(e.message); }
+});
+
+/* ================= laboratório de estruturas ================= */
+const ABAS = [["grafo", "Dependências", "grafo"], ["avl", "Prazos", "árvore AVL"], ["heap", "Prioridades", "heap"],
+              ["hash", "Tabela", "tabela hash"], ["trie", "Prefixos", "trie"]];
+
+function renderAbas() {
+  const alvo = $("abas");
+  alvo.replaceChildren(...ABAS.map(([id, nome, estrutura]) =>
+    el("button", { class: "aba", type: "button", role: "tab", id: `aba-${id}`, "aria-selected": String(S.aba === id),
+      tabindex: S.aba === id ? "0" : "-1",
+      onclick: () => { S.aba = id; renderLab(); },
+      onkeydown: ev => {
+        const i = ABAS.findIndex(a => a[0] === S.aba);
+        const j = ev.key === "ArrowRight" ? (i + 1) % ABAS.length : ev.key === "ArrowLeft" ? (i + ABAS.length - 1) % ABAS.length : -1;
+        if (j >= 0) { ev.preventDefault(); S.aba = ABAS[j][0]; renderLab(); $(`aba-${S.aba}`).focus(); }
+      } }, nome, el("small", {}, estrutura))));
+}
+
+function renderLab() {
+  renderAbas();
+  const p = $("painel");
+  p.setAttribute("aria-labelledby", `aba-${S.aba}`);
+  p.replaceChildren();
+  if (!S.dados.tarefas.length) {
+    p.append(el("p", { class: "legenda" }, "As estruturas aparecem aqui assim que houver tarefas. Cada alteração na lista atualiza este painel."));
+    return;
+  }
+  ({ grafo: painelGrafo, avl: painelAVL, heap: painelHeap, hash: painelHash, trie: painelTrie })[S.aba](p);
+}
+
+const abrir = id => () => abrirDialogo(id);
+function teclaAbrir(id) { return ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); abrirDialogo(id); } }; }
+function classeNo(t) {
+  if (t.status === "concluida") return "n-concluida";
+  if (t.bloqueios.length) return "n-bloqueada";
+  if (t.status === "andamento") return "n-andamento";
+  return "";
+}
+
+/* ---------- grafo ---------- */
+function painelGrafo(p) {
+  const { nos, arestas, ordem, critico } = S.dados.estruturas.grafo, mapa = porId();
+  const ligados = new Set(); arestas.forEach(([a, b]) => { ligados.add(a); ligados.add(b); });
+  const comLigacao = nos.filter(n => ligados.has(n)), isolados = nos.filter(n => !ligados.has(n));
+  const pred = new Map(comLigacao.map(n => [n, []])), suc = new Map(comLigacao.map(n => [n, []]));
+  arestas.forEach(([a, b]) => { pred.get(b).push(a); suc.get(a).push(b); });
+
+  // camadas: maior distância a partir de uma tarefa sem pré-requisitos (Kahn)
+  const camada = new Map(), grau = new Map(comLigacao.map(n => [n, pred.get(n).length]));
+  const fila = comLigacao.filter(n => grau.get(n) === 0); fila.forEach(n => camada.set(n, 0));
+  while (fila.length) {
+    const n = fila.shift();
+    for (const s of suc.get(n)) {
+      camada.set(s, Math.max(camada.get(s) ?? 0, camada.get(n) + 1));
+      grau.set(s, grau.get(s) - 1);
+      if (grau.get(s) === 0) fila.push(s);
+    }
+  }
+  const colunas = []; comLigacao.forEach(n => (colunas[camada.get(n)] ||= []).push(n));
+  const linhaDe = new Map();
+  const bary = n => pred.get(n).reduce((s, x) => s + linhaDe.get(x), 0) / pred.get(n).length;
+  colunas.forEach((col, i) => { col.sort(i ? (a, b) => bary(a) - bary(b) || a - b : (a, b) => a - b); col.forEach((n, j) => linhaDe.set(n, j)); });
+
+  const W = 164, H = 46, GX = 48, GY = 16, M = 16;
+  const pos = new Map();
+  colunas.forEach((col, c) => col.forEach((n, j) => pos.set(n, { x: M + c * (W + GX), y: M + j * (H + GY) })));
+  const linhasMax = Math.max(0, ...colunas.map(c => c.length));
+  let yIso = M, altura = M * 2 + Math.max(0, linhasMax * (H + GY) - GY);
+  const cols = Math.max(colunas.length, 2);
+  if (isolados.length) {
+    yIso = altura + (comLigacao.length ? 26 : 0);
+    isolados.forEach((n, k) => pos.set(n, { x: M + (k % cols) * (W + GX), y: yIso + Math.floor(k / cols) * (H + GY) }));
+    altura = yIso + Math.ceil(isolados.length / cols) * (H + GY) - GY + M;
+  }
+  const largura = M * 2 + cols * (W + GX) - GX;
+  const crit = new Set(); for (let i = 0; i + 1 < critico.length; i++) crit.add(critico[i] + ">" + critico[i + 1]);
+
+  const svg = sv("svg", { width: largura, height: altura, viewBox: `0 0 ${largura} ${altura}`, role: "img",
+    "aria-label": "Grafo de dependências entre tarefas" },
+    sv("defs", {},
+      ...["", " critica"].map((c, i) => sv("marker", { id: `seta${i}`, viewBox: "0 0 10 10", refX: "9", refY: "5", markerWidth: "7", markerHeight: "7", orient: "auto-start-reverse" },
+        sv("path", { d: "M0 0 L10 5 L0 10 z", class: "seta" + c })))));
+  // setas que chegam na mesma tarefa terminam em pontos diferentes da borda esquerda
+  const chegam = new Map(comLigacao.map(n => [n, [...pred.get(n)].sort((u, v) => pos.get(u).y - pos.get(v).y)]));
+  for (const [a, b] of arestas) {
+    const A = pos.get(a), B = pos.get(b), x1 = A.x + W, y1 = A.y + H / 2, x2 = B.x, k = crit.has(a + ">" + b);
+    const lista = chegam.get(b), y2 = B.y + H / 2 + (lista.indexOf(a) - (lista.length - 1) / 2) * 12;
+    svg.append(sv("path", { class: "aresta" + (k ? " critica" : ""), d: `M${x1} ${y1} C${x1 + 36} ${y1}, ${x2 - 36} ${y2}, ${x2 - 2} ${y2}`, "marker-end": `url(#seta${k ? 1 : 0})` }));
+  }
+  if (isolados.length && comLigacao.length)
+    svg.append(sv("text", { x: M, y: yIso - 10, "font-size": 13, class: "leve" }, "Sem dependências"));
+  for (const n of nos) {
+    const t = mapa.get(n), { x, y } = pos.get(n);
+    svg.append(sv("g", { class: `no ${classeNo(t)}${n === S.recente ? " recente" : ""}`, tabindex: "0", role: "button",
+      "aria-label": `Tarefa ${n}: ${t.titulo}. Abrir`, onclick: abrir(n), onkeydown: teclaAbrir(n) },
+      sv("title", {}, `#${n} ${t.titulo}`),
+      sv("rect", { x, y, width: W, height: H, rx: 4 }),
+      sv("text", { x: x + 10, y: y + 18, "font-size": 11.5, class: "mono leve" }, `#${n}` + (t.prazo ? `  ${dataCurta(t.prazo)}` : "")),
+      sv("text", { x: x + 10, y: y + 36, "font-size": 14, "font-weight": 600 }, cortar(t.titulo, 19))));
+  }
+  p.append(
+    el("p", { class: "legenda" }, el("strong", {}, "Grafo dirigido: "), "uma seta de A para B significa que A vem antes de B. ",
+      "O sistema recusa dependências que criariam ciclo (busca em profundidade)."),
+    el("div", { class: "rolagem" }, ajustar(svg, largura)),
+    el("div", { class: "chaves" },
+      el("span", {}, el("i"), "pendente"), el("span", {}, el("i", { class: "a" }), "em andamento"),
+      el("span", {}, el("i", { class: "c" }), "concluída"), el("span", {}, el("i", { class: "b" }), "bloqueada"),
+      critico.length > 1 && el("span", {}, el("i", { class: "k" }), `caminho crítico (${critico.length} tarefas em sequência)`)),
+    el("p", { class: "legenda", style: "margin-top:12px" }, el("strong", {}, "Ordem de execução (ordenação topológica): "),
+      ordem.length ? ordem.map(i => "#" + i).join(", ") : "nada pendente."));
+}
+
+/* ---------- AVL ---------- */
+function painelAVL(p) {
+  const { raiz, tamanho, altura } = S.dados.estruturas.avl, mapa = porId();
+  let i = 0, maxD = 0; const nos = [];
+  (function passo(n, d) { if (!n) return; passo(n.esq, d + 1); n._x = i++; n._y = d; maxD = Math.max(maxD, d); nos.push(n); passo(n.dir, d + 1); })(raiz, 0);
+  const DX = 66, DY = 92, M = 34, R = 20;
+  const largura = M * 2 + Math.max(0, i - 1) * DX, alt = M + maxD * DY + 62;
+  const X = n => M + n._x * DX, Y = n => M + n._y * DY;
+  const svg = sv("svg", { width: Math.max(largura, 160), height: alt, viewBox: `0 0 ${Math.max(largura, 160)} ${alt}`, role: "img", "aria-label": "Árvore AVL de tarefas por prazo" });
+  for (const n of nos) for (const f of [n.esq, n.dir]) if (f)
+    svg.append(sv("line", { class: "aresta", x1: X(n), y1: Y(n), x2: X(f), y2: Y(f) }));
+  for (const n of nos) {
+    const t = mapa.get(n.valor), fb = (n.fator > 0 ? "+" : "") + n.fator;
+    svg.append(sv("g", { class: `no ${classeNo(t)}${n.valor === S.recente ? " recente" : ""}`, tabindex: "0", role: "button",
+      "aria-label": `Tarefa ${n.valor}: ${t.titulo}. Abrir`, onclick: abrir(n.valor), onkeydown: teclaAbrir(n.valor) },
+      sv("title", {}, `#${n.valor} ${t.titulo}\nprazo: ${t.prazo ? dataLonga(t.prazo) : "sem prazo"}\naltura do nó: ${n.altura}, fator de balanceamento: ${fb}`),
+      sv("circle", { cx: X(n), cy: Y(n), r: R }),
+      sv("text", { x: X(n), y: Y(n) + 5, "text-anchor": "middle", "font-size": 13, "font-weight": 600, class: "mono" }, `#${n.valor}`),
+      sv("text", { x: X(n), y: Y(n) + R + 15, "text-anchor": "middle", "font-size": 12.5, class: "halo" }, dataCurta(n.chave[0])),
+      sv("text", { x: X(n), y: Y(n) + R + 29, "text-anchor": "middle", "font-size": 11, class: "mono leve halo" }, `fb ${fb}`)));
+  }
+  const minima = Math.ceil(Math.log2(tamanho + 1));
+  p.append(
+    el("p", { class: "legenda" }, el("strong", {}, "Árvore AVL: "), "a chave de cada nó é (prazo, id), então o percurso da esquerda para a direita lista as tarefas por prazo. ",
+      "Depois de cada inserção ou remoção, rotações mantêm o fator de balanceamento (fb) de todos os nós em -1, 0 ou +1."),
+    el("div", { class: "rolagem" }, ajustar(svg, Math.max(largura, 160))),
+    el("p", { class: "legenda", style: "margin-top:12px" }, `${tamanho} nós, altura ${altura}. A menor altura possível para ${tamanho} nós é ${minima}.`,
+      " Tarefas sem prazo ficam no fim, com o traço no lugar da data."));
+}
+
+/* ---------- heap ---------- */
+function painelHeap(p) {
+  const lista = S.dados.estruturas.heap, mapa = porId(), n = lista.length;
+  if (!n) { p.append(el("p", { class: "legenda" }, "A fila está vazia: todas as tarefas estão concluídas.")); return; }
+  const niveis = Math.floor(Math.log2(n)) + 1, DY = 84, M = 34, R = 20;
+  const largura = Math.max(2 ** (niveis - 1) * 62, 200), alt = M + (niveis - 1) * DY + 56;
+  const pos = i => { const l = Math.floor(Math.log2(i + 1)), k = i - (2 ** l - 1); return { x: (k + .5) * largura / 2 ** l, y: M + l * DY }; };
+  const svg = sv("svg", { width: largura, height: alt, viewBox: `0 0 ${largura} ${alt}`, role: "img", "aria-label": "Heap de prioridades como árvore binária" });
+  for (let i = 1; i < n; i++) { const a = pos((i - 1) >> 1), b = pos(i); svg.append(sv("line", { class: "aresta", x1: a.x, y1: a.y, x2: b.x, y2: b.y })); }
+  lista.forEach((e, i) => {
+    const t = mapa.get(e.item), { x, y } = pos(i);
+    svg.append(sv("g", { class: `no ${classeNo(t)}${i === 0 ? " raiz" : ""}${e.item === S.recente ? " recente" : ""}`, tabindex: "0", role: "button",
+      "aria-label": `Tarefa ${e.item}: ${t.titulo}. Abrir`, onclick: abrir(e.item), onkeydown: teclaAbrir(e.item) },
+      sv("title", {}, `#${e.item} ${t.titulo}\nposição ${i} no vetor`),
+      sv("circle", { cx: x, cy: y, r: R }),
+      sv("text", { x, y: y + 5, "text-anchor": "middle", "font-size": 13, "font-weight": 600, class: "mono" }, `#${e.item}`),
+      sv("text", { x, y: y + R + 16, "text-anchor": "middle", "font-size": 12.5, class: "halo" }, `P${e.prioridade[0]}`)));
+  });
+  p.append(
+    el("p", { class: "legenda" }, el("strong", {}, "Heap mínimo: "), "o pai nunca é menos urgente que os filhos. A ordem de comparação é prioridade, depois prazo, depois id. ",
+      "A raiz (em amarelo) é a tarefa mais urgente da fila, mesmo que esteja bloqueada; a próxima tarefa do topo da página pula as bloqueadas."),
+    el("div", { class: "rolagem" }, ajustar(svg, largura)),
+    el("p", { class: "legenda", style: "margin:12px 0 0" }, "Como o heap fica guardado, em um vetor (os filhos da posição i estão em 2i+1 e 2i+2):"),
+    el("div", { class: "celulas" }, lista.map((e, i) =>
+      el("div", { class: "celula" + (i === 0 ? " topo-fila" : "") },
+        el("button", { type: "button", onclick: abrir(e.item), "aria-label": `Posição ${i}: tarefa ${e.item}` }, `#${e.item}`, el("span", { class: "p" }, `P${e.prioridade[0]}`)),
+        el("span", { class: "i" }, i)))));
+}
+
+/* ---------- tabela hash ---------- */
+function painelHash(p) {
+  const { baldes, tamanho, carga } = S.dados.estruturas.hash, mapa = porId();
+  const grade = el("div", { class: "baldes", role: "list" });
+  baldes.forEach((chaves, i) => {
+    grade.append(el("div", { class: "ind", role: "listitem" }, i));
+    const cadeia = el("div", { class: "cadeia" });
+    if (!chaves.length) cadeia.append(el("span", { class: "nada" }, "vazio"));
+    chaves.forEach((id, k) => {
+      if (k) cadeia.append(el("span", { class: "lig", "aria-hidden": "true" }, "→"));
+      cadeia.append(el("button", { type: "button", title: mapa.get(id).titulo, onclick: abrir(id) }, `#${id}`));
+    });
+    if (chaves.length > 1) cadeia.append(el("span", { class: "colisao" }, `colisão: ${chaves.length} tarefas no mesmo balde`));
+    grade.append(cadeia);
+  });
+  p.append(
+    el("p", { class: "legenda" }, el("strong", {}, "Tabela hash: "), "o id da tarefa passa por uma função de dispersão (polinômio de base 31) e o resto da divisão pela capacidade escolhe o balde. ",
+      "Ids que caem no mesmo balde ficam encadeados. Passando de 0,75 de fator de carga, a tabela dobra de tamanho e redistribui tudo."),
+    el("p", { class: "legenda" }, `${tamanho} tarefas em ${baldes.length} baldes, fator de carga ${String(carga).replace(".", ",")}.`),
+    grade);
+}
+
+/* ---------- trie ---------- */
+function painelTrie(p) {
+  const raiz = S.dados.estruturas.trie, mapa = porId();
+  const q = S.busca.modo === "prefixo" ? semAcento(S.busca.q.trim()) : "";
+  function ramo(n, prefixo, prof) {
+    let letras = n.letra, cur = n;
+    while (!cur.ids.length && cur.filhos.length === 1) { cur = cur.filhos[0]; letras += cur.letra; }
+    const completo = prefixo + letras;
+    const noCaminho = q && (completo.startsWith(q) || q.startsWith(completo));
+    const fim = cur.ids.length ? el("span", { class: "fim" }, "palavra de ", cur.ids.map((id, k) =>
+      [k ? ", " : "", el("button", { type: "button", title: mapa.get(id)?.titulo, onclick: abrir(id) }, `#${id}`)])) : null;
+    if (!cur.filhos.length)
+      return el("li", {}, el("span", { class: "folha-t" + (noCaminho ? " caminho" : "") }, el("span", { class: "letras" }, letras), fim));
+    return el("li", {}, el("details", { class: noCaminho ? "caminho" : "", open: prof < 2 || noCaminho },
+      el("summary", {}, el("span", { class: "letras" }, letras), fim),
+      el("ul", {}, cur.filhos.map(f => ramo(f, completo, prof + 1)))));
+  }
+  p.append(
+    el("p", { class: "legenda" }, el("strong", {}, "Trie: "), "cada nó guarda uma letra e cada caminho da raiz até um nó marcado forma uma palavra de um título ou de uma tag. ",
+      "Buscar um prefixo é descer pelas letras e listar tudo o que está abaixo. Sequências sem ramificação aparecem juntas para caber na tela. ",
+      q ? "O caminho do prefixo digitado está em amarelo." : "Digite na busca, no modo prefixo, para ver o caminho percorrido."),
+    el("div", { class: "trie" }, el("ul", {}, raiz.filhos.map(f => ramo(f, "", 0)))));
+}
+
+/* ================= ligações iniciais ================= */
+$("nova").addEventListener("click", () => abrirDialogo());
+$("ordem").addEventListener("change", ev => { S.ordem = ev.target.value; carregar(); });
+$("q").addEventListener("input", ev => { S.busca.q = ev.target.value; clearTimeout(tBusca); tBusca = setTimeout(() => refazerFiltros(), 180); });
+document.querySelectorAll("input[name=modo]").forEach(r => r.addEventListener("change", () => { S.busca.modo = r.value; refazerFiltros(); }));
+$("de").addEventListener("change", () => refazerFiltros());
+$("ate").addEventListener("change", () => refazerFiltros());
+$("limpar").addEventListener("click", limparFiltros);
+
+carregar().catch(e => { document.body.append(el("p", { style: "padding:24px" }, "Não foi possível falar com o servidor: " + e.message)); });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "proximo_id": 2,
+  "tarefas": [
+    {
+      "id": 1,
+      "titulo": "atividade",
+      "descricao": "DB",
+      "prazo": "2026-12-12",
+      "prioridade": 2,
+      "status": "concluida",
+      "tags": [
+        "ESTUDO"
+      ]
+    }
+  ],
+  "dependencias": []
+}
