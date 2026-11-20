@@ -1,8 +1,6 @@
-# TaskFlow — Gerenciador de Tarefas com Dependências
+# Quest — Gerenciador de Tarefas com Dependências
 
 Atividade avaliativa de Estruturas de Dados II. Sistema CRUD de tarefas (estudo/projetos) sem banco de dados, com interação por terminal e uma estrutura de dados para cada item do conteúdo programático. Só usa a biblioteca padrão do Python 3.9+.
-
-## Tema (para a apresentação de 19 e 21/10)
 
 Gerenciador de tarefas acadêmicas e de projetos em que **tarefas podem depender de outras** (ex.: "Escrever relatório" só pode ser concluída depois de "Implementar trabalho"). O sistema responde a perguntas como: *o que devo fazer agora? em que ordem fazer tudo? o que vence neste período? qual tarefa tem "grafo" no nome, mesmo que eu digite errado?*
 
